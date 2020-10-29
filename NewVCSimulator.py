@@ -20,6 +20,8 @@ import abc
 ############
 #includes header in count
 MSG_LEN = 4
+#message is created when rand(0, MSG_FREQ)==0, i.e. big MSG_FREQ means smaller generation chance
+MSG_FREQ = 20
 DIM1 = 2
 DIM2 = 2
 PORTS = 4
@@ -137,7 +139,7 @@ class Processor(Container):
     def step(self, address):
         
         #generate a message 1 in 10 steps
-        if random.randint(0, 30) == 0:
+        if random.randint(0, MSG_FREQ) == 0:
             self.generate_msg(address)
                                  
 #holds an amount of flits in input and output buffers
