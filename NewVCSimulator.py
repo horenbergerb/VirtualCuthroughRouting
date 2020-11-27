@@ -4,9 +4,14 @@ import abc
 ##########
 #Thoughts#
 ##########
-#needs a QUEUE internal to the router. currently preference is being given to ports in the order they're checked (0,1,2,3), so it's possible messages could be unduly neglected.
+#so recently i redesigned the router class in a big way.
+#i realized many problems are simplified if the movements are queued up in the outgoing ports
+#so incoming headers are processed into a request which gets put into the respective out port's queue
+#this handles lots of issues with locking and whatnot in a very natural way
 
-#i should add a locking system to the ports in the router that uses a queue of requests; sending a request adds you to the lock queue, then you simply wait until the lock says it is reserved for you. When done, you must tell the lock you have finished and it will move to the next item in its queue.
+#there are still some small bugs with this new setup, and i also need to implement some additional assumptions about the movement (flits do not move when their header is sitting in an input port)
+
+#after i smooth this out, though, i just need to start implementing measurement protocols (and check the message distance assumption)
 
 #############
 #ASSUMPTIONS#
