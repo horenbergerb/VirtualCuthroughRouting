@@ -1,0 +1,9 @@
+THINGS TO REMEMBER:
+  ***Accumulation should occur ONLY when header is in output, otherwise flits only move when header moves
+       Does not accumulte when header is stuck in input
+  Msg len should be ~200 flits
+  Msg distance should be less than 1/2 lenth/width (could also fix by using odd dimension?)
+  Track total # of messages
+    Must be stable; count messages over different time intervals and look for stability
+  GOAL: measure latency for a fixed value of lambda
+    LATER GOALS: if lambda suddenly changes, how does system react?

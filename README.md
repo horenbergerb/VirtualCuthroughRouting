@@ -51,11 +51,12 @@ Inter-router routing is more elaborate. When a header is received in an input, t
 
 ### To Do:
 
-1) Implement inter-router queue for output port access
-2) Create unit tests for debugging
-3) Rewrite documentation using docstring, PEP 8
-4) Create measurement facilities (latency, detect saturation pt, count total number of messages, etc)
-5) Test larger cases (msg len 200 flits)
+1) Restrict flits to accumulate only when header is in the output port
+2) Implement inter-router queue for output port access
+3) Create unit tests for debugging
+4) Rewrite documentation using docstring, PEP 8
+5) Create measurement facilities (latency, detect saturation pt, count total number of messages, etc)
+6) Test larger cases (msg len 200 flits)
 
 ### Long Term:
 
