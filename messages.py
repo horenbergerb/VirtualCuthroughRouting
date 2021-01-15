@@ -23,6 +23,16 @@ class Message:
         self.headerID = id(header)
         self.popped = 0
 
+    def __str__(self):
+        #we truncate the ID for aesthetic purposes
+        result = "{}: ".format(self.headerID % 1000)
+        for cur in self.items:
+            if isinstance(cur, Header):
+                result += "H"
+            else:
+                result += "F"
+        return result
+        
     def add_flit(self, flit):
         if not self.items or isinstance(self.items[0], Header):
             flit.moved = True
@@ -46,6 +56,12 @@ class Message:
 class FlitQueue:
     def __init__(self):
         self.queue = []
+
+    def __str__(self):
+        result = ""
+        for cur in self.queue:
+            result += str(cur) + "\n"
+        return result
 
     def pop_flit(self):
         if self.queue:
@@ -79,6 +95,11 @@ class FlitQueue:
         for x in self.queue:
             length += len(x.items)
         return length
+
+    def set_moved(self):
+        for cur_msg in self.queue:
+            for cur_flit in cur_msg.items:
+                cur_flit.moved = True
         
     def reset_moved(self):
         for cur_msg in self.queue:

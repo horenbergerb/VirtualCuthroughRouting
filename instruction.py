@@ -2,7 +2,9 @@ class InstructionQueue:
     def __init__(self):
         self.instructions = []
 
-    def pop_instruction(self, index=0):
+    def pop(self, index=0):
+        '''Pop a single move instruction at a given index.
+        Clears the instruction if all moves are complete'''
         instruction = None
         if len(self.instructions) > index:
             instruction = self.instructions[index]
@@ -12,16 +14,16 @@ class InstructionQueue:
 
         return instruction
     
-    def get_instructions(self):
+    def get(self):
         return self.instructions
 
-    def len_instructions(self):
+    def __len__(self):
         return len(self.instructions)
 
     def has_instructions(self):
         return bool(self.instructions)
 
-    def add_instruction(self, instruction):
+    def add(self, instruction):
         self.instructions.append(instruction)
         
     def get_source(self, index=0):

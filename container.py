@@ -1,4 +1,4 @@
-from messages import Header, FlitQueue
+from messages import Header, Flit, FlitQueue
 from instruction import InstructionQueue
 
 ##################
@@ -7,7 +7,7 @@ from instruction import InstructionQueue
 
 
 class Container():
-    '''Container is the abstract class used to model router ports and processors.
+    '''Container is the class used to model router ports and processors.
 
     It mostly offers methods to take/receive flits from/to buffers.
     '''
@@ -17,24 +17,24 @@ class Container():
         self.Obuffer = FlitQueue()
         self.instructions = InstructionQueue()
 
+    def __str__(self):
+        result = "I: "
+        if isinstance(self.Ibuffer, Header):
+            result += "{}: H".format(id(self.Ibuffer) % 1000)
+        elif isinstance(self.Ibuffer, Flit):
+            result += "{}: F".format(self.Ibuffer.headerID % 1000)
+        result += "\n" + "O:\n"
+        result += str(self.Obuffer)
+        return result
+    
     def has_instructions(self):
+        '''Check if instructions exist'''
         return self.instructions.has_instructions()
 
-    def pop_instruction(self, index=0):
-        return self.instructions.pop_instruction(index)
-
     def get_instructions(self):
-        return self.instructions.get_instruction()
-
-    def get_instruction_source(self, index=0):
-        return self.instructions.get_source(index)
-
-    def add_instruction(self, instruction):
-        self.instructions.add_instruction(instruction)
-
-    def len_instructions(self):
-        return self.instructions.len_instructions()
-
+        '''Used to interact with the container's instructions'''
+        return self.instructions
+    
     def putI(self, package):
         '''Put item into the input buffer. Also marks the flit as having moved.
         Caution: Will overwrite input buffer contents.'''
@@ -63,6 +63,7 @@ class Container():
 
     def getO(self):
         '''Pops an item off the output buffer'''
+        self.Obuffer.set_moved()
         return self.Obuffer.pop_flit()
 
     def reset_moved(self):
