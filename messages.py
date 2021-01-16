@@ -1,4 +1,3 @@
-from parameters import MSG_LEN
 
 
 class Flit:
@@ -10,7 +9,7 @@ class Flit:
         
 class Header:
     '''Header object which leads message.'''
-    def __init__(self, dest, time, length=MSG_LEN):
+    def __init__(self, dest, time, length):
         self.dest = dest
         self.length = length
         self.moved = False
@@ -55,9 +54,10 @@ class Message:
 
     
 class FlitQueue:
-    def __init__(self):
+    def __init__(self, MSG_LEN):
         self.queue = []
-
+        self.MSG_LEN = MSG_LEN
+        
     def __str__(self):
         result = ""
         for cur in self.queue:
@@ -67,7 +67,7 @@ class FlitQueue:
     def pop_flit(self):
         if self.queue:
             result = self.queue[0].pop_flit()
-            if self.queue[0].popped >= MSG_LEN:
+            if self.queue[0].popped >= self.MSG_LEN:
                 self.queue.pop(0)
             result.moved = True
             return result

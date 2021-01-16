@@ -1,7 +1,7 @@
 from router import Router
 from routergrid import RouterGrid
 
-from parameters import MSG_LEN, MSG_FREQ, DIM1, DIM2, PORTS, UP, RIGHT, DOWN, LEFT, DIRS
+from parameters import PORTS, UP, RIGHT, DOWN, LEFT, DIRS
 
 import random
 
@@ -19,13 +19,18 @@ import random
 class TwoDToroidalNetwork:
     # routers in the self.routers matrix are connected to adjacent routers
     # connections apply modulo dim1 and dim2 (because it's a toroidal network)
-    def __init__(self, MSG_FREQ=MSG_FREQ):
+    def __init__(self, DIM1=2, DIM2=2, MSG_LEN=20, SAMPLE_THRESH=50000, MSG_FREQ=.03, PATH_LEN=2):
+        self.DIM1 = DIM1
+        self.DIM2 = DIM2
+        self.MSG_LEN = MSG_LEN
+        self.SAMPLE_THRESH = SAMPLE_THRESH
+        self.MSG_FREQ = MSG_FREQ
+        self.PATH_LEN = PATH_LEN
+
         random.seed()
         self.time = 0
-
-        self.MSG_FREQ = MSG_FREQ
         # table of routers
-        self.routers = RouterGrid(MSG_FREQ=self.MSG_FREQ)
+        self.routers = RouterGrid(DIM1, DIM2, MSG_LEN, SAMPLE_THRESH, MSG_FREQ, PATH_LEN)
 
     def __str__(self):
         result = ""

@@ -1,19 +1,19 @@
 from router import Router
-from parameters import DIRS, UP, DOWN, LEFT, RIGHT, DIM1, DIM2, MSG_FREQ
+from parameters import DIRS, UP, DOWN, LEFT, RIGHT
 
 
 class RouterGrid():
-    def __init__(self, MSG_FREQ=MSG_FREQ, dim1=DIM1, dim2=DIM2):
-        self.dim1 = dim1
-        self.dim2 = dim2
+    def __init__(self, DIM1, DIM2, MSG_LEN, SAMPLE_THRESH, MSG_FREQ, PATH_LEN):
+        self.DIM1 = DIM1
+        self.DIM2 = DIM2
 
         # table of routers
         self.routers = []
-        for x in range(0, self.dim1):
+        for x in range(0, self.DIM1):
             cur_row = []
-            for y in range(0, self.dim2):
+            for y in range(0, self.DIM2):
                 # creates router with the address corresponding to network dimensions
-                cur_row.append(Router([x, y], MSG_FREQ=MSG_FREQ))
+                cur_row.append(Router([x, y], DIM1, DIM2, MSG_FREQ, MSG_LEN, PATH_LEN, SAMPLE_THRESH))
             self.routers.append(cur_row)
 
     def get_routers(self):
@@ -27,23 +27,23 @@ class RouterGrid():
 
     def get_port_in_dir(self, i, j, dir):
         if dir == UP:
-            return self.routers[(i-1) % DIM1][j].ports[DOWN]
+            return self.routers[(i-1) % self.DIM1][j].ports[DOWN]
         elif dir == RIGHT:
-            return self.routers[i][(j+1) % DIM2].ports[LEFT]
+            return self.routers[i][(j+1) % self.DIM2].ports[LEFT]
         elif dir == DOWN:
-            return self.routers[(i+1) % DIM1][j].ports[UP]
+            return self.routers[(i+1) % self.DIM1][j].ports[UP]
         elif dir == LEFT:
-            return self.routers[i][(j-1) % DIM2].ports[RIGHT]
+            return self.routers[i][(j-1) % self.DIM2].ports[RIGHT]
 
     def get_router_index_in_dir(self, i, j, dir):
         if dir == UP:
-            return (i-1) % DIM1, j
+            return (i-1) % self.DIM1, j
         elif dir == RIGHT:
-            return i, (j+1) % DIM2
+            return i, (j+1) % self.DIM2
         elif dir == DOWN:
-            return (i+1) % DIM1, j
+            return (i+1) % self.DIM1, j
         elif dir == LEFT:
-            return i, (j-1) % DIM2
+            return i, (j-1) % self.DIM2
 
     def move_inter_router(self, i, j):
         moved = []

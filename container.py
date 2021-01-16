@@ -12,9 +12,9 @@ class Container():
     It mostly offers methods to take/receive flits from/to buffers.
     '''
 
-    def __init__(self):
+    def __init__(self, MSG_LEN):
         self.Ibuffer = None
-        self.Obuffer = FlitQueue()
+        self.Obuffer = FlitQueue(MSG_LEN)
         self.instructions = InstructionQueue()
 
     def __str__(self):

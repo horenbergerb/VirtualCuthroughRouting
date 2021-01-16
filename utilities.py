@@ -1,8 +1,8 @@
 from instruction import Instruction
 
-from parameters import UP, DOWN, LEFT, RIGHT, DIM1, DIM2
+from parameters import UP, DOWN, LEFT, RIGHT
 
-def shortest_path(cur, source, address, ports, time):
+def shortest_path(cur, source, address, ports, time, DIM1, DIM2):
     '''Given a new header, determines proper destination port
     and creates a corresponding instruction.'''
     instruction = Instruction(source, -1, cur.length, time)

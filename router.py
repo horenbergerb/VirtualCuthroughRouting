@@ -4,24 +4,26 @@ from instruction import Instruction
 from container import Container
 from utilities import shortest_path
 
-from parameters import MSG_LEN, MSG_FREQ, DIM1, DIM2, PORTS, UP, RIGHT, DOWN, LEFT, DIRS
+from parameters import PORTS, UP, RIGHT, DOWN, LEFT, DIRS
 
 import itertools
 
 
 class Router:
-    def __init__(self, address, MSG_FREQ=MSG_FREQ):
+    def __init__(self, address, DIM1, DIM2, MSG_FREQ, MSG_LEN, PATH_LEN, SAMPLE_THRESH):
         # address used for header parsing and message generation
         self.address = address
         self.time = 0
+        self.DIM1 = DIM1
+        self.DIM2 = DIM2
 
         # the four ports of the router
         self.ports = []
         for x in range(0, PORTS):
-            self.ports.append(Container())
+            self.ports.append(Container(MSG_LEN))
 
         # the router's processor
-        self.processor = Processor(MSG_FREQ=MSG_FREQ)
+        self.processor = Processor(DIM1, DIM2, MSG_FREQ, MSG_LEN, PATH_LEN, SAMPLE_THRESH)
 
     def __str__(self):
         result = "Router Readout: ({}, {})".format(*(self.address)) + "\n"
@@ -39,7 +41,7 @@ class Router:
 
     def parse_header(self, cur, source):
         '''Parses a Header into an Instruction object'''
-        return shortest_path(cur, source, self.address, self.ports, self.time)
+        return shortest_path(cur, source, self.address, self.ports, self.time, self.DIM1, self.DIM2)
 
     def move(self, time):
         '''Moves flits from IBuffers to OBuffers using

@@ -4,7 +4,7 @@
 # PARAMETERS #
 ##############
 
-
+'''
 # Length of a message. Includes header in count
 MSG_LEN = 20
 # Frequency at which processors create messages
@@ -17,7 +17,7 @@ SAMPLE_THRESH = 50000
 # Size of the network along each axis
 DIM1 = 2
 DIM2 = 2
-
+'''
 #############
 # CONSTANTS #
 #############
