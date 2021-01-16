@@ -36,9 +36,13 @@ def shortest_path(cur, source, address, ports, time):
         instruction.dest = lr_dir
         return instruction
 
-    # pick choice with shortest queue
-    if ports[lr_dir].Obuffer.get_length() < ports[ud_dir].Obuffer.get_length():
+    # pick empty queue
+    lr_empty = ports[lr_dir].Obuffer.get_length() == 0
+    ud_empty = ports[ud_dir].Obuffer.get_length() == 0
+    if lr_empty and not ud_empty:
         instruction.dest = lr_dir
+    elif ud_empty and not lr_empty:
+        instruction.dest = ud_dir
     else:
         # tie breaker goes with smallest port number
         instruction.dest = min(lr_dir, ud_dir)

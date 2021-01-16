@@ -1,9 +1,9 @@
 from router import Router
-from parameters import DIRS, UP, DOWN, LEFT, RIGHT, DIM1, DIM2
+from parameters import DIRS, UP, DOWN, LEFT, RIGHT, DIM1, DIM2, MSG_FREQ
 
 
 class RouterGrid():
-    def __init__(self, dim1=DIM1, dim2=DIM2):
+    def __init__(self, MSG_FREQ=MSG_FREQ, dim1=DIM1, dim2=DIM2):
         self.dim1 = dim1
         self.dim2 = dim2
 
@@ -13,7 +13,7 @@ class RouterGrid():
             cur_row = []
             for y in range(0, self.dim2):
                 # creates router with the address corresponding to network dimensions
-                cur_row.append(Router([x, y]))
+                cur_row.append(Router([x, y], MSG_FREQ=MSG_FREQ))
             self.routers.append(cur_row)
 
     def get_routers(self):
@@ -67,6 +67,6 @@ class RouterGrid():
     def follow_inter_movements(self, i, j, moved, time):
         '''Propagates an inter-router movement, i.e.
         processes all consequential movement'''
-        moved = self.routers[i][j].move()
+        moved = self.routers[i][j].move(time)
         if moved:
             self.follow_intra_movements(i, j, moved, time)

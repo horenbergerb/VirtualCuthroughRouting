@@ -2,6 +2,12 @@ class InstructionQueue:
     def __init__(self):
         self.instructions = []
 
+    def __str__(str):
+        result = ""
+        for instr in self.instructions:
+            result += str(result) + "\n"
+        return result
+            
     def pop(self, index=0):
         '''Pop a single move instruction at a given index.
         Clears the instruction if all moves are complete'''
@@ -41,3 +47,6 @@ class Instruction:
         self.dest = dest
         self.amount = amount
         self.time = time
+
+    def __str__(self):
+        return "Source: {}, Dest: {}, Amount: {}, Time: {}".format(self.source,self.dest,self.amount,self.time)

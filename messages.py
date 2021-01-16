@@ -10,11 +10,12 @@ class Flit:
         
 class Header:
     '''Header object which leads message.'''
-    def __init__(self, dest, length=MSG_LEN):
+    def __init__(self, dest, time, length=MSG_LEN):
         self.dest = dest
         self.length = length
         self.moved = False
         self.parsed = False
+        self.time = time
 
 
 class Message:
@@ -86,7 +87,7 @@ class FlitQueue:
             return True
         else:
             for cur_msg in self.queue:
-                if cur_msg.headerID == new_flit.headerID and not cur_msg.items or isinstance(cur_msg.items[0], Header):
+                if cur_msg.headerID == new_flit.headerID and (not cur_msg.items or isinstance(cur_msg.items[0], Header)):
                     new_flit.moved = True
                     return cur_msg.add_flit(new_flit)
 

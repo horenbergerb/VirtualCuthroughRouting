@@ -6,9 +6,11 @@ from utilities import shortest_path
 
 from parameters import MSG_LEN, MSG_FREQ, DIM1, DIM2, PORTS, UP, RIGHT, DOWN, LEFT, DIRS
 
+import itertools
+
 
 class Router:
-    def __init__(self, address):
+    def __init__(self, address, MSG_FREQ=MSG_FREQ):
         # address used for header parsing and message generation
         self.address = address
         self.time = 0
@@ -19,17 +21,17 @@ class Router:
             self.ports.append(Container())
 
         # the router's processor
-        self.processor = Processor()
+        self.processor = Processor(MSG_FREQ=MSG_FREQ)
 
     def __str__(self):
         result = "Router Readout: ({}, {})".format(*(self.address)) + "\n"
         data = []
         for x in range(0, len(self.ports)):
             cur_result = ["Port {}".format(x)]
-            cur_result.extend(str(self.ports[x]).split("\n"))
+            cur_result.extend(str(self.ports[x]).rstrip("\n").split("\n"))
             data.append(cur_result)
         col_width = max(len(entry) for row in data for entry in row) + 2
-        data = zip(*data)
+        data = list(map(list, itertools.zip_longest(*data, fillvalue="")))
         for row in data:
             result += "".join(entry.ljust(col_width) for entry in row) + "\n"
 
@@ -39,12 +41,12 @@ class Router:
         '''Parses a Header into an Instruction object'''
         return shortest_path(cur, source, self.address, self.ports, self.time)
 
-    def move(self):
+    def move(self, time):
         '''Moves flits from IBuffers to OBuffers using
         port/processor instructions.'''
         moved = []
         # Movement internal to processor
-        self.processor.move()
+        self.processor.move(time)
         # Port logic
         for port in self.ports:
             instructions = port.get_instructions()
@@ -102,11 +104,11 @@ class Router:
 
             counter += 1
 
-    def step(self, time):
+    def step(self, time, do_print=False):
         self.time = time
-        self.processor.step(self.address)
+        self.processor.step(self.address, time, do_print)
         self.parse_all_inputs()
-        moved = self.move()
+        moved = self.move(time)
         return moved
 
     def reset_moved(self):
