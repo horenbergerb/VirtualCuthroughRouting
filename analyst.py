@@ -24,6 +24,17 @@ def get_avg_lifetime(network):
     lengths = [x[1]-x[0] for x in lifetimes]
     return sum(lengths)/len(lengths)
 
+def get_avg_lifetime_from_file(filename):
+    with open(filename) as f:
+        csv_reader = csv.reader(f, delimiter=',')
+        labels = next(csv_reader, None)
+        lengths = []
+        for row in csv_reader:
+            lengths.append(float(row[1]))
+        if len(lengths) == 0:
+            return 0
+        return sum(lengths)/len(lengths)
+
 
 def get_lifetime_lengths(network):
     lifetimes = network.get_lifetimes()
@@ -40,15 +51,21 @@ def get_birth_times(network):
 ###############################
 
 
-def get_avg_lifetimes_vs_prob(DIM, MSG_LEN, SAMPLE_THRESH, PATH_LEN, probs, do_save=True):
+def get_avg_lifetimes_vs_prob(DIM, MSG_LEN, SAMPLE_THRESH, PATH_LEN, probs, do_save=True, do_overwrite = False):
     avgs = []
     dir_name = "latency{}x{}_{}flit_path{}".format(DIM, DIM, MSG_LEN, PATH_LEN)
     try:
         os.mkdir(dir_name)
     except:
         pass
+
+    csvs = [f for f in os.listdir(dir_name) if f.endswith('.csv')]
     
     for FREQ in probs:
+        if not do_overwrite:
+            if "birth_vs_lifetime_{}.csv".format(FREQ) in csvs:
+                avgs.append(get_avg_lifetime_from_file(dir_name+"/birth_vs_lifetime_{}.csv".format(FREQ)))
+                continue
         cur_net = TwoDToroidalNetwork(DIM1=DIM, DIM2=DIM, MSG_LEN=MSG_LEN, SAMPLE_THRESH=SAMPLE_THRESH, MSG_FREQ=FREQ, PATH_LEN=PATH_LEN)
         #max time simulated is based on section 4.1 of the paper
         cur_net.step(amount=int(SAMPLE_THRESH+(40*PATH_LEN/FREQ)))
@@ -58,10 +75,13 @@ def get_avg_lifetimes_vs_prob(DIM, MSG_LEN, SAMPLE_THRESH, PATH_LEN, probs, do_s
             save([x,y],["Birth Time", "Lifetime"], dir_name+"/birth_vs_lifetime_{}.csv".format(FREQ))
         avgs.append(get_avg_lifetime(cur_net))
         if get_avg_lifetime(cur_net) == 0:
+            while len(avgs) < len(probs):
+                avgs.append(0)
             break
 
     if do_save:
-        save([probs, avgs],["Probability", "Average Lifetime"], dir_name+"/avg_lifetimes_vs_prob.csv")
+        if do_overwrite or avg_lifetimes_vs_prob.csv not in csvs:
+            save([probs, avgs],["Probability", "Average Lifetime"], dir_name+"/avg_lifetimes_vs_prob.csv")
     return probs, avgs
 
 
