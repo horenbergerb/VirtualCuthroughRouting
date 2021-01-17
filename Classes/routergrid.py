@@ -48,7 +48,7 @@ class RouterGrid():
     def move_inter_router(self, i, j):
         moved = []
         for p in DIRS:
-            if self.routers[i][j].ports[p].peekO() is not None and not self.routers[i][j].ports[p].peekO().moved:
+            if self.routers[i][j].ports[p].obuffer_is_ready():
                 dest_port = self.get_port_in_dir(i, j, p)
                 if dest_port.peekI() is None:
                     dest_port.putI(self.routers[i][j].ports[p].getO())

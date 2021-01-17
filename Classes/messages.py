@@ -32,7 +32,7 @@ class Message:
             else:
                 result += "F"
         return result
-        
+
     def add_flit(self, flit):
         if not self.items or isinstance(self.items[0], Header):
             flit.moved = True
@@ -94,9 +94,9 @@ class FlitQueue:
     def get_length(self):
         length = 0
         for x in self.queue:
-            length += len(x.items)
+            length += self.MSG_LEN-x.popped
         return length
-
+    
     def set_moved(self):
         '''Rather unpleasantly hacked so that
         only relevant msgs are tampered with'''

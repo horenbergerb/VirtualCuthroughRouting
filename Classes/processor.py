@@ -29,14 +29,6 @@ class Processor(Container):
             dest_x = (address[0] + x_dist) % self.DIM1
             dest_y = (address[1] + ((-1)**random.randint(0, 1))*(self.PATH_LEN-abs(x_dist))) % self.DIM2
             dest = [dest_x, dest_y]
-        '''
-        dest = [random.randint(0, (self.DIM1-1)), random.randint(0, (self.DIM2-1))]
-        # prevent messages sent to our own address
-        dist = min([(dest[0]-address[0])%self.DIM1, (address[0]-dest[0])%self.DIM1])
-        dist += min([(dest[1]-address[1])%self.DIM2, (address[0]-dest[0])%self.DIM1])
-        while dest == address or dist != self.PATH_LEN:
-            dest = [random.randint(0, (self.DIM1-1)), random.randint(0, (self.DIM2-1))]
-        '''
         if do_print:
             print("    NEW MESSAGE W/ DEST: {}".format(dest))
         new_header = Header(dest, time, self.MSG_LEN)
@@ -62,11 +54,10 @@ class Processor(Container):
     # step is called exactly once per unit time
 
     def step(self, address, time, do_print=False):
-        if self.header_trash_timers:
-            if self.header_trash_timers[0] + self.MSG_LEN < time:
-                self.header_trash_timers.pop(0)
-                self.header_trash.pop(0)
-        
+        while self.header_trash_timers and self.header_trash_timers[0] + self.MSG_LEN < time:
+            self.header_trash_timers.pop(0)
+            self.header_trash.pop(0)
+
         # generate a message 1 in 10 steps
         if random.uniform(0, 1) <= self.MSG_FREQ:
             self.generate_msg(address, time, do_print)

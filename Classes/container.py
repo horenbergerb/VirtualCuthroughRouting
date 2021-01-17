@@ -55,6 +55,13 @@ class Container():
         '''Get without popping from output buffer'''
         return self.Obuffer.peek()
 
+    def obuffer_is_ready(self):
+        '''Whether the Obuffer has contents ready
+        to be moved'''
+        #peeko is not none and peeko is not moved
+        cur = self.Obuffer.peek()
+        return (cur is not None) and (not cur.moved)
+    
     def getI(self):
         '''Pops an item off the input buffer'''
         self.Ibuffer.moved = True

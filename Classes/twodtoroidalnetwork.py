@@ -43,7 +43,7 @@ class TwoDToroidalNetwork:
         for x in range(amount):
             if do_print:
                 print("TIME: {}".format(self.time))
-            # part 1: iterate over all routers, continue moving until there's nothign left to move
+            # part 1: iterate over all routers, continue moving until there's nothing left to move
             for i in range(0, len(self.routers)):
                 for j in range(0, len(self.routers[0])):
                     # inter-router movement
@@ -65,5 +65,5 @@ class TwoDToroidalNetwork:
         for i in range(0, len(self.routers)):
             for j in range(0, len(self.routers[0])):
                 lifetimes.extend(self.routers[i][j].processor.lifetimes)
-        lifetimes = sorted(lifetimes)
+        lifetimes.sort(key=lambda x: int(x[0]))
         return lifetimes
