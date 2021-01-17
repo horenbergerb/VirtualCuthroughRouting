@@ -57,19 +57,21 @@ def get_avg_lifetimes_vs_prob(DIM, MSG_LEN, SAMPLE_THRESH, PATH_LEN, probs, do_s
             y = get_lifetime_lengths(cur_net)
             save([x,y],["Birth Time", "Lifetime"], dir_name+"/birth_vs_lifetime_{}.csv".format(FREQ))
         avgs.append(get_avg_lifetime(cur_net))
+        if get_avg_lifetime(cur_net) == 0:
+            break
 
     if do_save:
         save([probs, avgs],["Probability", "Average Lifetime"], dir_name+"/avg_lifetimes_vs_prob.csv")
     return probs, avgs
 
 
-def test_all_combinations(dims, path_lens, msg_lens):
+def test_all_combinations(dims, path_lens, msg_lens, probs):
     for dim in dims:
         for path_len in path_lens:
             if path_len > dim:
                 break
             for msg_len in msg_lens:
-                get_avg_lifetimes_vs_prob(dim, msg_len, 50000, path_len, do_save=True)
+                get_avg_lifetimes_vs_prob(dim, msg_len, 50000, path_len, probs, do_save=True)
                 make_plots_for_dir("latency{}x{}_{}flit_path{}".format(dim, dim, msg_len, path_len))
 
 
