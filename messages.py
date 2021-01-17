@@ -98,11 +98,13 @@ class FlitQueue:
         return length
 
     def set_moved(self):
-        for cur_msg in self.queue:
-            for cur_flit in cur_msg.items:
+        '''Rather unpleasantly hacked so that
+        only relevant msgs are tampered with'''
+        for cur_msg in range(0,min([2,len(self.queue)])):
+            for cur_flit in self.queue[cur_msg].items:
                 cur_flit.moved = True
         
     def reset_moved(self):
-        for cur_msg in self.queue:
-            for cur_flit in cur_msg.items:
+        for cur_msg in range(0,min([2,len(self.queue)])):
+            for cur_flit in self.queue[cur_msg].items:
                 cur_flit.moved = False

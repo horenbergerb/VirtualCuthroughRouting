@@ -12,21 +12,15 @@ def save(cols, col_names, dest):
         rows = list(itertools.zip_longest(*cols))
         writer.writerows(rows)
 
+#######################
+# CALCULATION/UTILITY #
+#######################
+        
+        
 def get_avg_lifetime(network):
     lifetimes = network.get_lifetimes()
     lengths = [x[1]-x[0] for x in lifetimes]
     return sum(lengths)/len(lengths)
-
-
-def plot_scatter(x, y, labels, show=True, do_save=False, filename="plot.png"):
-    plt.scatter(x, y)
-    plt.xlabel(labels[0])
-    plt.ylabel(labels[1])
-    if show:
-        plt.show()
-    if do_save:
-        plt.savefig(filename)
-    plt.clf()
 
 
 def get_lifetime_lengths(network):
@@ -39,7 +33,12 @@ def get_birth_times(network):
     return [x[0] for x in lifetimes]
 
 
-def get_avg_lifetimes_vs_prob(DIM, MSG_LEN, SAMPLE_THRESH, PATH_LEN, min_prob=.0025, max_prob=.0425, interval=.0025, max_time = 70000, do_save=True):
+###############################
+# NUMERICAL EXPERIMENTAL DATA #
+###############################
+
+
+def get_avg_lifetimes_vs_prob(DIM, MSG_LEN, SAMPLE_THRESH, PATH_LEN, min_prob=.0025, max_prob=.05, interval=.0025, do_save=True):
     probs = []
     avgs = []
     dir_name = "latency{}x{}_{}flit_path{}".format(DIM, DIM, MSG_LEN, PATH_LEN)
@@ -50,7 +49,8 @@ def get_avg_lifetimes_vs_prob(DIM, MSG_LEN, SAMPLE_THRESH, PATH_LEN, min_prob=.0
     
     for FREQ in np.arange(min_prob, max_prob, interval):
         cur_net = TwoDToroidalNetwork(DIM1=DIM, DIM2=DIM, MSG_LEN=MSG_LEN, SAMPLE_THRESH=SAMPLE_THRESH, MSG_FREQ=FREQ, PATH_LEN=PATH_LEN)
-        cur_net.step(amount=max_time)
+        #max time simulated is based on section 4.1 of the paper
+        cur_net.step(amount=SAMPLE_THRESH+(40*PATH_LEN/FREQ))
         if do_save:
             x = get_birth_times(cur_net)
             y = get_lifetime_lengths(cur_net)
@@ -69,8 +69,30 @@ def test_all_combinations(dims, path_lens, msg_lens):
             if path_len > dim:
                 break
             for msg_len in msg_lens:
-                get_avg_lifetimes_vs_prob(dim, msg_len, 50000, path_len)
+                get_avg_lifetimes_vs_prob(dim, msg_len, 50000, path_len, do_save=True)
                 make_plots_for_dir("latency{}x{}_{}flit_path{}".format(dim, dim, msg_len, path_len))
+
+
+############
+# PLOTTING #
+############
+
+
+def plot_scatter(x, y, labels, show=True, do_save=False, filename="plot.png"):
+    plt.scatter(x, y)
+    plt.xlabel(labels[0])
+    plt.ylabel(labels[1])
+    if show:
+        plt.show()
+    if do_save:
+        plt.savefig(filename)
+    plt.clf()
+
+
+def plot_lifetimes(network, show=True, do_save=False, filename="lifetimes.pngs"):
+    x = [a[0] for a in network.get_lifetimes()]
+    y = get_lifetime_lengths(network)
+    plot_scatter(x, y, ['Birth Time', 'Lifetime Length'], show=show, do_save=do_save, filename=filename)
 
 def make_plots_for_dir(dir):
     csvs = [f for f in os.listdir(dir) if f.endswith('.csv')]

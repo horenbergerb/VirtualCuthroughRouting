@@ -57,6 +57,7 @@ class Container():
 
     def getI(self):
         '''Pops an item off the input buffer'''
+        self.Ibuffer.moved = True
         out = self.Ibuffer
         self.Ibuffer = None
         return out
