@@ -1,7 +1,7 @@
-from router import Router
-from routergrid import RouterGrid
+from Classes.router import Router
+from Classes.routergrid import RouterGrid
 
-from parameters import PORTS, UP, RIGHT, DOWN, LEFT, DIRS
+from Classes.parameters import PORTS, UP, RIGHT, DOWN, LEFT, DIRS
 
 import random
 

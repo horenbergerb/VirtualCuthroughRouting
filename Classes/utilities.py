@@ -1,6 +1,6 @@
-from instruction import Instruction
+from Classes.instruction import Instruction
 
-from parameters import UP, DOWN, LEFT, RIGHT
+from Classes.parameters import UP, DOWN, LEFT, RIGHT
 
 def shortest_path(cur, source, address, ports, time, DIM1, DIM2):
     '''Given a new header, determines proper destination port

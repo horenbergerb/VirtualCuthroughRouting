@@ -1,5 +1,5 @@
-from messages import Header, Flit
-from container import Container
+from Classes.messages import Header, Flit
+from Classes.container import Container
 
 import random
 

@@ -1,5 +1,5 @@
-from router import Router
-from parameters import DIRS, UP, DOWN, LEFT, RIGHT
+from Classes.router import Router
+from Classes.parameters import DIRS, UP, DOWN, LEFT, RIGHT
 
 
 class RouterGrid():

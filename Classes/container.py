@@ -1,5 +1,5 @@
-from messages import Header, Flit, FlitQueue
-from instruction import InstructionQueue
+from Classes.messages import Header, Flit, FlitQueue
+from Classes.instruction import InstructionQueue
 
 ##################
 # ABSTRACT CLASS #

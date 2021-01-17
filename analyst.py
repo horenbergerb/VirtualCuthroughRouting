@@ -1,4 +1,4 @@
-from twodtoroidalnetwork import TwoDToroidalNetwork
+from Classes.twodtoroidalnetwork import TwoDToroidalNetwork
 from matplotlib import pyplot as plt
 import numpy as np
 import csv
@@ -19,6 +19,8 @@ def save(cols, col_names, dest):
         
 def get_avg_lifetime(network):
     lifetimes = network.get_lifetimes()
+    if len(lifetimes) == 0:
+        return 0
     lengths = [x[1]-x[0] for x in lifetimes]
     return sum(lengths)/len(lengths)
 
@@ -38,8 +40,7 @@ def get_birth_times(network):
 ###############################
 
 
-def get_avg_lifetimes_vs_prob(DIM, MSG_LEN, SAMPLE_THRESH, PATH_LEN, min_prob=.0025, max_prob=.05, interval=.0025, do_save=True):
-    probs = []
+def get_avg_lifetimes_vs_prob(DIM, MSG_LEN, SAMPLE_THRESH, PATH_LEN, probs, do_save=True):
     avgs = []
     dir_name = "latency{}x{}_{}flit_path{}".format(DIM, DIM, MSG_LEN, PATH_LEN)
     try:
@@ -47,15 +48,14 @@ def get_avg_lifetimes_vs_prob(DIM, MSG_LEN, SAMPLE_THRESH, PATH_LEN, min_prob=.0
     except:
         pass
     
-    for FREQ in np.arange(min_prob, max_prob, interval):
+    for FREQ in probs:
         cur_net = TwoDToroidalNetwork(DIM1=DIM, DIM2=DIM, MSG_LEN=MSG_LEN, SAMPLE_THRESH=SAMPLE_THRESH, MSG_FREQ=FREQ, PATH_LEN=PATH_LEN)
         #max time simulated is based on section 4.1 of the paper
-        cur_net.step(amount=SAMPLE_THRESH+(40*PATH_LEN/FREQ))
+        cur_net.step(amount=int(SAMPLE_THRESH+(40*PATH_LEN/FREQ)))
         if do_save:
             x = get_birth_times(cur_net)
             y = get_lifetime_lengths(cur_net)
             save([x,y],["Birth Time", "Lifetime"], dir_name+"/birth_vs_lifetime_{}.csv".format(FREQ))
-        probs.append(FREQ)
         avgs.append(get_avg_lifetime(cur_net))
 
     if do_save:
@@ -105,4 +105,5 @@ def make_plots_for_dir(dir):
             for row in csv_reader:
                 x.append(float(row[0]))
                 y.append(float(row[1]))
-            plot_scatter(x, y, labels, show=False, do_save=True,filename=dir+"/"+cur_csv[:-4]+".png")
+            if len(x) > 0:
+                plot_scatter(x, y, labels, show=False, do_save=True,filename=dir+"/"+cur_csv[:-4]+".png")

@@ -1,10 +1,10 @@
-from messages import Header
-from processor import Processor
-from instruction import Instruction
-from container import Container
-from utilities import shortest_path
+from Classes.messages import Header
+from Classes.processor import Processor
+from Classes.instruction import Instruction
+from Classes.container import Container
+from Classes.utilities import shortest_path
 
-from parameters import PORTS, UP, RIGHT, DOWN, LEFT, DIRS
+from Classes.parameters import PORTS, UP, RIGHT, DOWN, LEFT, DIRS
 
 import itertools
 
