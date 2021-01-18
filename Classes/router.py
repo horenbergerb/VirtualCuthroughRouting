@@ -86,14 +86,34 @@ class Router:
         instruction.dest = is_valid.index(True)
         return instruction
 
-    def move(self, time):
+    def move(self, time, chosen_ports=None):
         '''Moves flits from IBuffers to OBuffers using
         port/processor instructions.'''
         moved = []
+
         # Movement internal to processor
-        self.processor.move(time)
+        if chosen_ports is None:
+            self.processor.move(time)
+        
+        # Processor logic
+        if self.processor.Ibuffer is None and chosen_ports is None:
+            instructions = self.processor.instructions
+            source = instructions.get_source()
+            if source is not None:
+                target = self.ports[source].Ibuffer
+                if target is not None and not target.moved:
+                    instructions.pop()
+                    self.processor.putI(
+                        self.ports[source].getI())
+                    moved.append(source)
+
+        if chosen_ports is None:
+            chosen_ports = self.ports
+        else:
+            chosen_ports = [self.ports[x] for x in chosen_ports]
+            
         # Port logic
-        for port in self.ports:
+        for port in chosen_ports:
             instructions = port.instructions
             for cur_index in range(0, len(instructions)):
                 source = instructions.get_source(cur_index)
@@ -108,17 +128,6 @@ class Router:
                                 self.processor.getO()
                                 instructions.pop(cur_index)
 
-        # Processor logic
-        if self.processor.Ibuffer is None:
-            instructions = self.processor.instructions
-            source = instructions.get_source()
-            if source is not None:
-                target = self.ports[source].Ibuffer
-                if target is not None and not target.moved:
-                    instructions.pop()
-                    self.processor.putI(
-                        self.ports[source].getI())
-                    moved.append(source)
 
         return moved
     

@@ -51,7 +51,7 @@ class TwoDToroidalNetwork:
                     self.routers.follow_intra_movements(i, j, moved, self.time)
                     moved = self.routers.move_inter_router(i, j)
                     self.routers.follow_inter_movements(i, j, moved, self.time)
-
+                    
             for i in range(0, self.DIM1):
                 for j in range(0, self.DIM2):
                     self.routers[i][j].reset_moved()
