@@ -1,4 +1,4 @@
-from Classes.messages import Header, Flit
+from Classes.messages import Header, Flit, Message
 from Classes.container import Container
 
 import random
@@ -33,13 +33,17 @@ class Processor(Container):
             print("    NEW MESSAGE W/ DEST: {}".format(dest))
         new_header = Header(dest, time, self.MSG_LEN)
         new_header.moved = True
-        self.Obuffer.add_flit(new_header)
+        new_header_id = id(new_header)
+        
+        new_msg = Message(new_header)
+        new_msg.add_flit(new_header)
         # one taken off for header
         for x in range(0, self.MSG_LEN-1):
-            new_flit = Flit(id(new_header))
+            new_flit = Flit(new_header_id)
             new_flit.moved = True
-            self.Obuffer.add_flit(new_flit)
-
+            new_msg.add_flit(new_flit)
+        self.Obuffer.add_msg(new_msg)
+        
     # move is called many times per unit time
     def move(self, time):
         # munch those inputs

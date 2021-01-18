@@ -1,10 +1,11 @@
-
+from collections import deque
 
 class Flit:
     '''Flit object which follows the Header of a message'''
     def __init__(self, headerID):
         self.moved = False
         self.headerID = headerID
+        self.is_header = False
 
         
 class Header:
@@ -15,13 +16,15 @@ class Header:
         self.moved = False
         self.parsed = False
         self.time = time
+        self.is_header = True
 
 
 class Message:
     def __init__(self, header):
-        self.items = [header]
+        self.items = deque([])
         self.headerID = id(header)
         self.popped = 0
+        self.next_message = None
 
     def __str__(self):
         #we truncate the ID for aesthetic purposes
@@ -34,7 +37,7 @@ class Message:
         return result
 
     def add_flit(self, flit):
-        if not self.items or isinstance(self.items[0], Header):
+        if not self.items or self.items[0].is_header:
             flit.moved = True
             self.items.append(flit)
             return True
@@ -44,7 +47,7 @@ class Message:
         if not self.items:
             return None
         self.popped += 1
-        return self.items.pop(0)
+        return self.items.popleft()
 
     def peek(self):
         '''Returns the flit next in line to be passed'''
@@ -55,7 +58,7 @@ class Message:
     
 class FlitQueue:
     def __init__(self, MSG_LEN):
-        self.queue = []
+        self.queue = deque()
         self.MSG_LEN = MSG_LEN
         
     def __str__(self):
@@ -68,7 +71,7 @@ class FlitQueue:
         if self.queue:
             result = self.queue[0].pop_flit()
             if self.queue[0].popped >= self.MSG_LEN:
-                self.queue.pop(0)
+                self.queue.popleft()
             result.moved = True
             return result
         return None
@@ -79,18 +82,22 @@ class FlitQueue:
             return result
         return None
 
+    def add_msg(self, new_msg):
+        self.queue.append(new_msg)
+
+    '''
     def add_flit(self, new_flit):
-        if isinstance(new_flit, Header):
+        if new_flit.is_header:
             new_flit.moved = True
             new_msg = Message(new_flit)
             self.queue.append(new_msg)
             return True
         else:
-            for cur_msg in self.queue:
-                if cur_msg.headerID == new_flit.headerID and (not cur_msg.items or isinstance(cur_msg.items[0], Header)):
+            for cur_msg in queue:
+                if cur_msg.headerID == new_flit.headerID and (not cur_msg.items or cur_msg.items[0].is_header):
                     new_flit.moved = True
                     return cur_msg.add_flit(new_flit)
-
+    '''
     def get_length(self):
         length = 0
         for x in self.queue:

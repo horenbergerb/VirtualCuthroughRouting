@@ -22,6 +22,14 @@ Simulating a network is as simple as
 In the parent directory, there are analytical tools in analyst.py, and
 you can see some examples of use in test.py.
 
+## Note On Optimized Computation
+
+To run this code I used PyPy:
+
+https://www.pypy.org/
+
+This makes a marked improvement on the computation time.
+
 ## The Code
 
 ### Class Overviews

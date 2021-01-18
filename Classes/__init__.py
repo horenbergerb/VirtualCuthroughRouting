@@ -7,5 +7,4 @@ from .router import *
 from .routergrid import *
 from .twodtoroidalnetwork import *
 from .parameters import *
-from .utilities import *
 '''

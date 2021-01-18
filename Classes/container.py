@@ -29,27 +29,19 @@ class Container():
     
     def has_instructions(self):
         '''Check if instructions exist'''
-        return self.instructions.has_instructions()
-
-    def get_instructions(self):
-        '''Used to interact with the container's instructions'''
-        return self.instructions
+        return self.instructions.instructions
     
     def putI(self, package):
         '''Put item into the input buffer. Also marks the flit as having moved.
         Caution: Will overwrite input buffer contents.'''
 
         self.Ibuffer = package
-        if isinstance(package, Header):
+        if package.is_header:
             package.parsed = False
 
     def putO(self, package):
         '''Put item into the output buffer or storage if buffer is full'''
         return self.Obuffer.add_flit(package)
-
-    def peekI(self):
-        '''Get without popping from input buffer'''
-        return self.Ibuffer
 
     def peekO(self):
         '''Get without popping from output buffer'''

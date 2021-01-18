@@ -1,8 +1,7 @@
-from Classes.messages import Header
+from Classes.messages import Header, Message
 from Classes.processor import Processor
 from Classes.instruction import Instruction
 from Classes.container import Container
-from Classes.utilities import shortest_path
 
 from Classes.parameters import PORTS, UP, RIGHT, DOWN, LEFT, DIRS
 
@@ -28,7 +27,7 @@ class Router:
     def __str__(self):
         result = "Router Readout: ({}, {})".format(*(self.address)) + "\n"
         data = []
-        for x in range(0, len(self.ports)):
+        for x in range(0, PORTS):
             cur_result = ["Port {}".format(x)]
             cur_result.extend(str(self.ports[x]).rstrip("\n").split("\n"))
             data.append(cur_result)
@@ -40,11 +39,9 @@ class Router:
         return result
 
     def parse_header(self, cur, source):
-        '''Parses a Header into an Instruction object'''
-        return shortest_path(cur, source, self.address, self.ports, self.time, self.DIM1, self.DIM2)
         '''Given a new header, determines proper destination port
         and creates a corresponding instruction.'''
-        instruction = Instruction(source, -1, cur.length, self.time)
+        instruction = Instruction(source, -1, Message(cur), cur.length, self.time)
         cur.parsed = True
         cur.moved = True
 
@@ -81,7 +78,7 @@ class Router:
         # pick empty queue if available
         for cur_port in range(len(is_valid)):
             if is_valid[cur_port]:
-                if not ports[cur_port].Obuffer.queue:
+                if not self.ports[cur_port].Obuffer.queue:
                     instruction.dest = cur_port
                     return instruction
 
@@ -97,23 +94,23 @@ class Router:
         self.processor.move(time)
         # Port logic
         for port in self.ports:
-            instructions = port.get_instructions()
+            instructions = port.instructions
             for cur_index in range(0, len(instructions)):
                 source = instructions.get_source(cur_index)
                 target = (self.ports[source].Ibuffer if source != -1 else self.processor.peekO()) if source is not None else None
                 if target is not None and not target.moved:
-                    if source != -1:
-                        if port.putO(target):
-                            self.ports[source].getI()
-                            instructions.pop(cur_index)
-                            moved.append(source)
-                    elif port.putO(target):
-                        self.processor.getO()
-                        instructions.pop(cur_index)
+                        if instructions[cur_index].msg.add_flit(target):
+                            if source != -1:
+                                self.ports[source].getI()
+                                instructions.pop(cur_index)
+                                moved.append(source)
+                            else:
+                                self.processor.getO()
+                                instructions.pop(cur_index)
 
         # Processor logic
-        if self.processor.peekI() is None:
-            instructions = self.processor.get_instructions()
+        if self.processor.Ibuffer is None:
+            instructions = self.processor.instructions
             source = instructions.get_source()
             if source is not None:
                 target = self.ports[source].Ibuffer
@@ -128,22 +125,22 @@ class Router:
     def parse_all_inputs(self):
         '''Creates new instructions from new Headers in input buffers.'''
         proc_instructions = []
-        port_instructions = [[] for x in range(len(self.ports))]
+        port_instructions = [[] for x in range(PORTS)]
         
         # PROCESSOR LOGIC
         cur = self.processor.peekO()
-        if isinstance(cur, Header) and not (cur.parsed or cur.moved):
+        if cur and cur.is_header and not (cur.parsed or cur.moved):
             new_instr = self.parse_header(cur, -1)
             port_instructions[new_instr.dest].append([cur.time, new_instr])
 
         # PORT LOGIC
-        for port in range(len(self.ports)):
-            cur = self.ports[port].peekI()
+        for port in range(PORTS):
+            cur = self.ports[port].Ibuffer
             # NOTE: Parsing the header takes up one time unit
             # thus moving a header takes 2 time units
-            if isinstance(cur, Header) and not (cur.moved or cur.parsed):
+            if cur and cur.is_header and not (cur.moved or cur.parsed):
                 if cur.dest == self.address:
-                    proc_instructions.append([cur.time, Instruction(port, -1, cur.length, self.time)])
+                    proc_instructions.append([cur.time, Instruction(port, -1, None, cur.length, self.time)])
                     cur.parsed = True
                     cur.moved = True
                 else:
@@ -152,16 +149,18 @@ class Router:
                     cur.moved = True
 
         proc_instructions.sort(key=lambda x: int(x[0]))
-        proc = self.processor.get_instructions()
+        proc = self.processor.instructions
         for instr in proc_instructions:
             proc.add(instr[1])
 
         for port in range(len(self.ports)):
             cur_port_instructions = port_instructions[port]
             cur_port_instructions.sort(key=lambda x: int(x[0]))
-            port_instr = self.ports[port].get_instructions()
+            port_instr = self.ports[port].instructions
             for instr in cur_port_instructions:
                 port_instr.add(instr[1])
+                self.ports[port].Obuffer.add_msg(instr[1].msg)
+
 
 
     def step(self, time, do_print=False):

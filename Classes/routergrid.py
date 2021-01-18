@@ -15,10 +15,7 @@ class RouterGrid():
                 # creates router with the address corresponding to network dimensions
                 cur_row.append(Router([x, y], DIM1, DIM2, MSG_FREQ, MSG_LEN, PATH_LEN, SAMPLE_THRESH))
             self.routers.append(cur_row)
-
-    def get_routers(self):
-        return self.routers
-
+    
     def __len__(self):
         return len(self.routers)
 
@@ -50,7 +47,7 @@ class RouterGrid():
         for p in DIRS:
             if self.routers[i][j].ports[p].obuffer_is_ready():
                 dest_port = self.get_port_in_dir(i, j, p)
-                if dest_port.peekI() is None:
+                if dest_port.Ibuffer is None:
                     dest_port.putI(self.routers[i][j].ports[p].getO())
                     moved.append(p)
         return moved

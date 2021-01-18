@@ -34,8 +34,8 @@ class TwoDToroidalNetwork:
 
     def __str__(self):
         result = ""
-        for i in range(0, len(self.routers)):
-            for j in range(0, len(self.routers[0])):
+        for i in range(0, self.DIM1):
+            for j in range(0, self.DIM2):
                 result += str(self.routers[i][j])
         return result
                 
@@ -44,16 +44,16 @@ class TwoDToroidalNetwork:
             if do_print:
                 print("TIME: {}".format(self.time))
             # part 1: iterate over all routers, continue moving until there's nothing left to move
-            for i in range(0, len(self.routers)):
-                for j in range(0, len(self.routers[0])):
+            for i in range(0, self.DIM1):
+                for j in range(0, self.DIM2):
                     # inter-router movement
                     moved = self.routers[i][j].step(self.time, do_print)
                     self.routers.follow_intra_movements(i, j, moved, self.time)
                     moved = self.routers.move_inter_router(i, j)
                     self.routers.follow_inter_movements(i, j, moved, self.time)
 
-            for i in range(0, len(self.routers)):
-                for j in range(0, len(self.routers[0])):
+            for i in range(0, self.DIM1):
+                for j in range(0, self.DIM2):
                     self.routers[i][j].reset_moved()
                     if do_print:
                         print(self.routers[i][j])
@@ -62,8 +62,8 @@ class TwoDToroidalNetwork:
 
     def get_lifetimes(self):
         lifetimes = []
-        for i in range(0, len(self.routers)):
-            for j in range(0, len(self.routers[0])):
+        for i in range(0, self.DIM1):
+            for j in range(0, self.DIM2):
                 lifetimes.extend(self.routers[i][j].processor.lifetimes)
         lifetimes.sort(key=lambda x: int(x[0]))
         return lifetimes
