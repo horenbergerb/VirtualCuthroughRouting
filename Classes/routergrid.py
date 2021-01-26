@@ -21,7 +21,7 @@ class RouterGrid():
             self.routers.append(cur_row)
     
     def __len__(self):
-        return len(self.routers)
+        return self.DIM1
 
     def __getitem__(self, key):
         return self.routers[key]

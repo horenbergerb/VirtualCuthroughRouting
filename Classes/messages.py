@@ -25,6 +25,7 @@ class Message:
         self.headerID = id(header)
         self.popped = 0
         self.next_message = None
+        self.length = 0
 
     def __str__(self):
         #we truncate the ID for aesthetic purposes
@@ -40,6 +41,7 @@ class Message:
         if not self.items or self.items[0].is_header:
             flit.moved = True
             self.items.append(flit)
+            self.length += 1
             return True
         return False
 
@@ -47,6 +49,7 @@ class Message:
         if not self.items:
             return None
         self.popped += 1
+        self.length -= 1
         return self.items.popleft()
 
     def peek(self):
@@ -60,6 +63,7 @@ class FlitQueue:
     def __init__(self, MSG_LEN):
         self.queue = deque()
         self.MSG_LEN = MSG_LEN
+        self.length = 0
         
     def __str__(self):
         result = ""
@@ -72,6 +76,7 @@ class FlitQueue:
             result = self.queue[0].pop_flit()
             if self.queue[0].popped >= self.MSG_LEN:
                 self.queue.popleft()
+                self.length -= 1
             result.moved = True
             return result
         return None
@@ -84,6 +89,7 @@ class FlitQueue:
 
     def add_msg(self, new_msg):
         self.queue.append(new_msg)
+        self.length += 1
 
     '''
     def add_flit(self, new_flit):
@@ -98,20 +104,21 @@ class FlitQueue:
                     new_flit.moved = True
                     return cur_msg.add_flit(new_flit)
     '''
+    '''
     def get_length(self):
         length = 0
         for x in self.queue:
             length += self.MSG_LEN-x.popped
         return length
-    
+    '''
     def set_moved(self):
         '''Rather unpleasantly hacked so that
         only relevant msgs are tampered with'''
-        for cur_msg in range(0,min([2,len(self.queue)])):
+        for cur_msg in range(0,min([2,self.length])):
             for cur_flit in self.queue[cur_msg].items:
                 cur_flit.moved = True
         
     def reset_moved(self):
-        for cur_msg in range(0,min([2,len(self.queue)])):
-            for cur_flit in self.queue[cur_msg].items:
-                cur_flit.moved = False
+        for cur_msg in range(0,min([2,self.length])):
+            for cur_flit in range(0,min([self.queue[cur_msg].length, 2])):
+                self.queue[cur_msg].items[cur_flit].moved = False

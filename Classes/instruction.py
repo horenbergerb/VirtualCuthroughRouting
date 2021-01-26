@@ -3,6 +3,7 @@ from collections import deque
 class InstructionQueue:
     def __init__(self):
         self.instructions = []
+        self.length = 0
 
     def __getitem__(self, key):
         return self.instructions[key]
@@ -19,11 +20,12 @@ class InstructionQueue:
         '''Pop a single move instruction at a given index.
         Clears the instruction if all moves are complete'''
         instruction = None
-        if len(self.instructions) > index:
+        if self.length > index:
             instruction = self.instructions[index]
             self.instructions[index].amount -= 1
             if self.instructions[index].amount <= 0:
                 del self.instructions[index]
+                self.length -= 1
 
         return instruction
     
@@ -31,13 +33,14 @@ class InstructionQueue:
         return self.instructions
 
     def __len__(self):
-        return len(self.instructions)
+        return self.length
 
     def add(self, instruction):
         self.instructions.append(instruction)
+        self.length += 1
         
     def get_source(self, index=0):
-        if len(self.instructions) <= index:
+        if self.length <= index:
             return None
         return self.instructions[index].source
 
